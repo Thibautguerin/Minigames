@@ -1,0 +1,1274 @@
+#!/usr/bin/python3
+
+import sys
+sys.path.insert(0, './include')
+from include import *
+sys.path.insert(0, './src')
+from drawRect import *
+from clic import *
+
+def choice_color2(window, color):
+	x = 0;
+	y = 0;
+	r = color[0]
+	g = color[1]
+	b = color[2]
+	save_r = r
+	save_g = g
+	save_b = b
+	dominant = 0
+	if (r == 255):
+		dominant = 1
+	elif (g == 255):
+		dominant = 2
+	else:
+		dominant = 3
+	limit = 0
+	while (y < 256):
+		if (dominant == 1):
+			limit = r
+		elif (dominant == 2):
+			limit = g
+		else:
+			limit = b
+		while (x < 256):
+			if (r < limit):
+				r = r + (limit - r)/(255 - x)
+			if (g < limit):
+				g = g + (limit - g)/(255 - x)
+			if (b < limit):
+				b = b + (limit - b)/(255 - x)
+			displayRect(window, (resolution[0] / 2 - 255 + x, resolution[1] / 2 - 80 + y, 1, 1), (int(r), int(g), int(b)))
+			x = x + 1
+		x = 0
+		if (save_r > 0):
+			save_r = save_r - (save_r / (255 - y))
+		if (save_g > 0):
+			save_g = save_g - (save_g / (255 - y))
+		if (save_b > 0):
+			save_b = save_b - (save_b / (255 - y))
+		y = y + 1
+		r = save_r
+		g = save_g
+		b = save_b
+
+def choice_color(window, default, obj):
+	global rainbow_b
+	global rainbow_w
+	running = True
+	#displayRect(window, (0, 0, resolution[0], resolution[1]), (30, 30, 30, 200), 0, False)
+	displayRect(window, (0, 0, resolution[0], resolution[1]), background, 0, False)
+	pos_bar = (resolution[0] / 2 - 261, resolution[1] / 2 - 180, 13, 90)
+	pos_circle_x = int(resolution[0] / 2 - 255)
+	pos_circle_y = int(resolution[1] / 2 - 80)
+	color_bar = (255, 0, 0)
+	color_circle = (255, 0, 0)
+
+	image = pygame.image.load("assets/rainbow.png")
+	
+	mouse_pos = pygame.mouse.get_pos()
+
+	displayRect(window, (resolution[0] / 2 - 305, resolution[1] / 2 - 225, 604, 450), (33, 33, 33), 20)
+	window.blit(image, (resolution[0] / 2 - 255, resolution[1] / 2 - 175))
+	choice_color2(window, color_bar)
+	displayRect(window, (resolution[0] / 2 + 15, resolution[1] / 2 - 80, 235, 255), color_circle)
+	displayRect(window, pos_bar, (255, 255, 255), 3, False, 3, (0, 0, 0, 0))
+	pygame.gfxdraw.circle(window, pos_circle_x, pos_circle_y, 7, (255, 255, 255))
+	pygame.gfxdraw.aacircle(window, pos_circle_x, pos_circle_y, 6, (255, 255, 255))
+	pygame.gfxdraw.circle(window, pos_circle_x, pos_circle_y, 5, (255, 255, 255))
+
+	while (running == True):
+
+		mouse_pos = pygame.mouse.get_pos()
+		if (mouse_pos[0] > resolution[0] / 2 - 255 and mouse_pos[0] < resolution[0] / 2 + 255 and mouse_pos[1] > resolution[1] / 2 - 175 and mouse_pos[1] < resolution[1] / 2 - 95):
+			if (pygame.mouse.get_pressed()[0]):
+				displayRect(window, (resolution[0] / 2 - 305, resolution[1] / 2 - 225, 604, 450), (33, 33, 33), 20)
+				window.blit(image, (resolution[0] / 2 - 255, resolution[1] / 2 - 175))
+				choice_color2(window, window.get_at((mouse_pos[0], mouse_pos[1])))
+				color_bar = window.get_at((mouse_pos[0], mouse_pos[1]))
+				color_circle = color_bar
+				pos_bar = (mouse_pos[0], resolution[1] / 2 - 180, 13, 90)
+				displayRect(window, (resolution[0] / 2 + 15, resolution[1] / 2 - 80, 235, 255), window.get_at((pos_circle_x, pos_circle_y)))
+				displayRect(window, pos_bar, (255, 255, 255), 3, False, 3, (0, 0, 0, 0))
+				pygame.gfxdraw.circle(window, pos_circle_x, pos_circle_y, 7, (255, 255, 255))
+				pygame.gfxdraw.aacircle(window, pos_circle_x, pos_circle_y, 6, (255, 255, 255))
+				pygame.gfxdraw.circle(window, pos_circle_x, pos_circle_y, 5, (255, 255, 255))
+		if (mouse_pos[0] > resolution[0] / 2 - 255 and mouse_pos[0] < resolution[0] / 2 and mouse_pos[1] > resolution[1] / 2 - 80 and mouse_pos[1] < resolution[1] / 2 + 175):
+			if (pygame.mouse.get_pressed()[0]):
+				displayRect(window, (resolution[0] / 2 - 305, resolution[1] / 2 - 225, 604, 450), (33, 33, 33), 20)
+				choice_color2(window, color_bar)
+				color_circle = window.get_at((mouse_pos[0], mouse_pos[1]))
+				pos_circle_x = mouse_pos[0]
+				pos_circle_y = mouse_pos[1]
+				window.blit(image, (resolution[0] / 2 - 255, resolution[1] / 2 - 175))
+				displayRect(window, (resolution[0] / 2 + 15, resolution[1] / 2 - 80, 235, 255), window.get_at((mouse_pos[0], mouse_pos[1])))
+				displayRect(window, pos_bar, (255, 255, 255), 3, False, 3, (0, 0, 0, 0))
+				pygame.gfxdraw.circle(window, pos_circle_x, pos_circle_y, 7, (255, 255, 255))
+				pygame.gfxdraw.aacircle(window, pos_circle_x, pos_circle_y, 6, (255, 255, 255))
+				pygame.gfxdraw.circle(window, pos_circle_x, pos_circle_y, 5, (255, 255, 255))
+		
+		if (mouse_pos[0] > resolution[0] / 2 - 455 and mouse_pos[0] < resolution[0] / 2 - 330 and mouse_pos[1] > resolution[1] / 2 - 63 and mouse_pos[1] < resolution[1] / 2 + 63):
+			displayRect(window, (resolution[0] / 2 - 455, resolution[1] / 2 - 63, 125, 125), (80, 80, 80), 24)
+			if (pygame.mouse.get_pressed()[0]):
+				wait_mouse_up()
+				if (obj == 0):
+					rainbow_b = False
+				else:
+					rainbow_w = False
+				return (default)
+		else:
+			displayRect(window, (resolution[0] / 2 - 455, resolution[1] / 2 - 63, 125, 125), param_color, 24)
+		displayText(window, LANG["default"], (resolution[0] / 2 - 392, resolution[1] / 2), write_color, 30)
+
+		if (mouse_pos[0] < resolution[0] / 2 + 455 and mouse_pos[0] > resolution[0] / 2 + 330 and mouse_pos[1] > resolution[1] / 2 - 63 and mouse_pos[1] < resolution[1] / 2 + 63):
+			displayRect(window, (resolution[0] / 2 + 330, resolution[1] / 2 - 63, 125, 125), (80, 80, 80), 24)
+			if (pygame.mouse.get_pressed()[0]):
+				wait_mouse_up()
+				if (obj == 0):
+					rainbow_b = False
+					time.sleep(0.05)
+					rainbow_b = True
+					threading.Thread(target=rainbow_background).start()
+				else:
+					rainbow_w = False
+					time.sleep(0.05)
+					rainbow_w = True
+					threading.Thread(target=rainbow_write).start()
+				return (True)
+		else:
+			displayRect(window, (resolution[0] / 2 + 330, resolution[1] / 2 - 63, 125, 125), param_color, 24)
+		displayText(window, LANG["multicolour"], (resolution[0] / 2 + 393, resolution[1] / 2), write_color, 30)
+
+		pygame.display.update()
+
+		for event in pygame.event.get():
+			if (event.type == QUIT):
+				return (False)
+			if (event.type == KEYDOWN):
+				if (event.key == K_ESCAPE):
+					running = False
+				if (event.key == K_RETURN):
+					if (obj == 0):
+						rainbow_b = False
+					else:
+						rainbow_w = False
+					return (color_circle)
+		clockFps.tick(maxFps)
+	return (True)
+
+def rainbow_write():
+	global write_color
+	state = 0
+	r = 255
+	g = 0
+	b = 0
+	time.sleep(1)
+	while (rainbow_w == True):
+		if (state == 0):
+		    g = g + 3
+		    if (g == 255):
+		        state = 1
+		if (state == 1):
+		    r = r - 3
+		    if (r == 0):
+		        state = 2
+		if (state == 2):
+		    b = b + 3
+		    if(b == 255):
+		        state = 3
+		if (state == 3):
+		    g = g - 3
+		    if (g == 0):
+		        state = 4
+		if (state == 4):
+		    r = r + 3
+		    if(r == 255):
+		        state = 5
+		if (state == 5):
+		    b = b - 3;
+		    if(b == 0):
+		        state = 0
+		write_color = (r, g, b)
+		clockFps.tick(60)
+
+def rainbow_background():
+	global background
+	state = 0
+	r = 255
+	g = 0
+	b = 0
+	while (rainbow_b == True):
+		if (state == 0):
+		    g = g + 3
+		    if (g == 255):
+		        state = 1
+		if (state == 1):
+		    r = r - 3
+		    if (r == 0):
+		        state = 2
+		if (state == 2):
+		    b = b + 3
+		    if(b == 255):
+		        state = 3
+		if (state == 3):
+		    g = g - 3
+		    if (g == 0):
+		        state = 4
+		if (state == 4):
+		    r = r + 3
+		    if(r == 255):
+		        state = 5
+		if (state == 5):
+		    b = b - 3;
+		    if(b == 0):
+		        state = 0
+		background = (r, g, b)
+		clockFps.tick(60)
+
+def displayText(window, text, pos, color, size, aa=True, alpha=255, bolt=False):
+	myfont = pygame.font.SysFont("test", size, bolt)
+	#myfont = pygame.font.Font("./assets/SupersonicRocketship.ttf", size)
+	display = myfont.render(text, aa, color)
+	display.set_alpha(alpha)
+
+	window.blit(display, (pos[0] - display.get_rect().width / 2, pos[1] - display.get_rect().height / 2))
+
+snake = [[940, 520]]
+food = [randint(0, 39) * 48, randint(0, 39) * 27]
+score = 0
+
+def solo1(window):
+	running = True
+	while (running == True):
+
+		mouse_pos = pygame.mouse.get_pos()
+		window.fill(background)
+
+		pygame.display.update()
+
+		for event in pygame.event.get():
+			if (event.type == QUIT):
+				return (False)
+			if (event.type == KEYDOWN):
+				if (event.key == K_ESCAPE):
+					running = False
+				#if (event.key == K_RETURN):
+				# insert function of a game	
+		clockFps.tick(maxFps)
+	return (True)
+
+def Solo(window):
+	global sologame
+	nbgame = 2
+	running = True
+	while (running == True):
+
+		mouse_pos = pygame.mouse.get_pos()
+		window.fill(background)
+
+		if (mouse_pos[0] > resolution[0] / 2 - int(935 * mult) and mouse_pos[0] < resolution[0] / 2 - int(885 * mult) and mouse_pos[1] > resolution[1] / 2 - int(30 * mult) and mouse_pos[1] < resolution[1] / 2 + int(30 * mult)):
+			pygame.draw.polygon(window, (200, 200, 200), ((resolution[0] / 2 - int(885 * mult), resolution[1] / 2 - int(30 * mult)), (resolution[0] / 2 - int(885 * mult), resolution[1] / 2 + int(30 * mult)), (resolution[0] / 2 - int(935 * mult), (resolution[1] / 2))))
+			if (pygame.mouse.get_pressed()[0]):
+				wait_mouse_up()
+				if (sologame < 0):
+					sologame = sologame + 1
+		else:
+			pygame.draw.polygon(window, (150, 150, 150), ((resolution[0] / 2 - int(885 * mult), resolution[1] / 2 - int(30 * mult)), (resolution[0] / 2 - int(885 * mult), resolution[1] / 2 + int(30 * mult)), (resolution[0] / 2 - int(935 * mult), (resolution[1] / 2))))
+		
+		if (mouse_pos[0] < resolution[0] / 2 + int(935 * mult) and mouse_pos[0] > resolution[0] / 2 + int(885 * mult) and mouse_pos[1] > resolution[1] / 2 - int(30 * mult) and mouse_pos[1] < resolution[1] / 2 + int(30 * mult)):
+			pygame.draw.polygon(window, (200, 200, 200), ((resolution[0] / 2 + int(885 * mult), resolution[1] / 2 - int(30 * mult)), (resolution[0] / 2 + int(885 * mult), resolution[1] / 2 + int(30 * mult)), (resolution[0] / 2 + int(935 * mult), (resolution[1] / 2))))
+			if (pygame.mouse.get_pressed()[0]):
+				wait_mouse_up()
+				if (nbgame > 1 + abs(sologame)):
+					sologame = sologame - 1
+		else:
+			pygame.draw.polygon(window, (150, 150, 150), ((resolution[0] / 2 + int(885 * mult), resolution[1] / 2 - int(30 * mult)), (resolution[0] / 2 + int(885 * mult), resolution[1] / 2 + int(30 * mult)), (resolution[0] / 2 + int(935 * mult), (resolution[1] / 2))))
+
+		displayRect(window, (resolution[0] / 2 - int(252 * mult) + sologame * (606 * mult), resolution[1] / 2 - int(400 * mult), int(504 * mult), int(800 * mult)), (50, 50, 50), int(40 * mult))
+		displayRect(window, (resolution[0] / 2 - int(-354 * mult) + sologame * (606 * mult), resolution[1] / 2 - int(400 * mult), int(504 * mult), int(800 * mult)), (50, 50, 50), int(40 * mult))
+
+		pygame.display.update()
+
+		for event in pygame.event.get():
+			if (event.type == QUIT):
+				return (False)
+			if (event.type == KEYDOWN):
+				if (event.key == K_ESCAPE):
+					running = False
+				if (event.key == K_LEFT):
+					if (sologame < 0):
+						sologame = sologame + 1
+				if (event.key == K_RIGHT):
+					if (nbgame > 1 + abs(sologame)):
+						sologame = sologame - 1
+				if (event.key == K_RETURN):
+					if (sologame == 0):
+						solo1(window)
+					# elif (sologame == -1):
+					# 	solo2(window)
+		clockFps.tick(maxFps)
+	return (True)
+
+def Multi(window):
+	running = True
+	while (running == True):
+
+		mouse_pos = pygame.mouse.get_pos()
+		window.fill(background)
+
+
+		pygame.display.update()
+
+		for event in pygame.event.get():
+			if (event.type == QUIT):
+				return (False)
+			if (event.type == KEYDOWN):
+				if (event.key == K_ESCAPE):
+					running = False
+		clockFps.tick(maxFps)
+	return (True)
+
+def Play(window):
+	running = True
+	value = True
+
+	while (running == True):
+
+		mouse_pos = pygame.mouse.get_pos()
+		window.fill(background)
+
+		displayText(window, LANG["gamemode"], (resolution[0] / 2, resolution[1] / 2 - int(400 * mult)), write_color, int(100 * mult))
+		if (mouse_pos[0] > resolution[0] / 2 - int(550 * mult) and mouse_pos[0] < resolution[0] / 2 - int(50 * mult) and mouse_pos[1] > resolution[1] / 2 - int(250 * mult) and mouse_pos[1] < resolution[1] / 2 + int(250 * mult)):
+			displayRect(window, (resolution[0] / 2 - int(550 * mult), resolution[1] / 2 - int(250 * mult), int(500 * mult), int(500 * mult)), button_on_click_color, int(49 * mult));
+			if (pygame.mouse.get_pressed()[0]):
+				wait_mouse_up()
+				value = Solo(window)
+				if (value == False):
+					return (False)
+		else:
+			displayRect(window, (resolution[0] / 2 - int(550 * mult), resolution[1] / 2 - int(250 * mult), int(500 * mult), int(500 * mult)), button_color, int(49 * mult));
+		displayText(window, LANG["solo"], (resolution[0] / 2 - int(300 * mult), resolution[1] / 2), write_color, int(100 * mult))
+
+		if (mouse_pos[0] > resolution[0] / 2 + int(50 * mult) and mouse_pos[0] < resolution[0] / 2 + int(550 * mult) and mouse_pos[1] > resolution[1] / 2 - int(250 * mult) and mouse_pos[1] < resolution[1] / 2 + int(250 * mult)):
+			displayRect(window, (resolution[0] / 2 + int(50 * mult), resolution[1] / 2 - int(250 * mult), int(500 * mult), int(500 * mult)), button_on_click_color, int(49 * mult));
+			if (pygame.mouse.get_pressed()[0]):
+				wait_mouse_up()
+				value = Solo(window)
+				if (value == False):
+					return (False)
+		else:
+			displayRect(window, (resolution[0] / 2 + int(50 * mult), resolution[1] / 2 - int(250 * mult), int(500 * mult), int(500 * mult)), button_color, int(49 * mult));
+		displayText(window, LANG["multi"], (resolution[0] / 2 + int(300 * mult), resolution[1] / 2), write_color, int(100 * mult))
+
+		pygame.display.update()
+
+		for event in pygame.event.get():
+			if (event.type == QUIT):
+				return (False)
+			if (event.type == KEYDOWN):
+				if (event.key == K_ESCAPE):
+					running = False
+		clockFps.tick(maxFps)
+	return (value)
+
+def Param(window):
+	running = True
+
+	while (running == True):
+		global LANG
+		global int_lang
+		global resolution
+		global int_res
+		global mult
+		global maxFps
+		global int_fps
+		global background
+		global write_color
+
+		mouse_pos = pygame.mouse.get_pos()
+
+		window.fill(background)
+		displayText(window, LANG["param"], (resolution[0] / 2, resolution[1] / 2 - int(400 * mult)), write_color, int(100 * mult))
+		
+		displayRect(window, (resolution[0] / 2 - int(250 * mult), resolution[1] / 2 - int(300 * mult), int(500 * mult), int(100 * mult)), param_color, int(49 * mult))
+		if (int_res == 0):
+			displayText(window, LANG["fs"], (resolution[0] / int(2 * mult), resolution[1] / 2 - int(250 * mult)), write_color, int(70 * mult))
+		else:
+			displayText(window, str(resolution[0]) + "x" + str(resolution[1]), (resolution[0] / 2, resolution[1] / 2 - int(250 * mult)), write_color, int(70 * mult))
+
+		displayRect(window, (resolution[0] / 2 - int(250 * mult), resolution[1] / 2 - int(150 * mult), int(500 * mult), int(100 * mult)), param_color, int(49 * mult))
+		displayText(window, str(maxFps) + LANG["fps"], (resolution[0] / 2, resolution[1] / 2 - int(100 * mult)), write_color, int(70 * mult))
+
+		displayRect(window, (resolution[0] / 2 - int(250 * mult), resolution[1] / 2, int(500 * mult), int(100 * mult)), param_color, int(49 * mult))
+		displayText(window, LANG["lang"], (resolution[0] / 2, resolution[1] / 2 + int(50 * mult)), write_color, int(70 * mult))
+
+		if (mouse_pos[0] > resolution[0] / 2 - int(325 * mult) and mouse_pos[0] < resolution[0] / 2 - int(265 * mult) and mouse_pos[1] > resolution[1] / 2 - int(280 * mult) and mouse_pos[1] < resolution[1] / 2 - int(220 * mult)):
+			pygame.draw.polygon(window, param_on_click_color, ((resolution[0] / 2 - int(265 * mult), resolution[1] / 2 - int(280 * mult)), (resolution[0] / 2 - int(265 * mult), resolution[1] / 2 - int(220 * mult)), (resolution[0] / 2 - int(325 * mult), (resolution[1] / 2 - int(220 * mult) + resolution[1] / 2 - int(280 * mult)) / 2)))
+			if (pygame.mouse.get_pressed()[0]):
+				wait_mouse_up()
+				if (int_res == 0):
+					int_res = len(res_tab) - 1
+				else:
+					int_res = int_res - 1
+				if (int_res == 0):
+					resolution = (infoObject.current_w, infoObject.current_h)
+					window = pygame.display.set_mode(resolution)
+					pygame.display.toggle_fullscreen()
+				else:
+					resolution = res_tab[int_res]
+					window = pygame.display.set_mode(resolution)
+				if (int_res <= 1):
+					mult = 1.0
+				elif (int_res == 2):
+					mult = float(5/6)
+				elif (int_res == 3):
+					mult = float(2/3)
+				elif (int_res == 4):
+					mult = float(1/2)
+
+		else:
+			pygame.draw.polygon(window, param_color, ((resolution[0] / 2 - int(265 * mult), resolution[1] / 2 - int(280 * mult)), (resolution[0] / 2 - int(265 * mult), resolution[1] / 2 - int(220 * mult)), (resolution[0] / 2 - int(325 * mult), (resolution[1] / 2 - int(220 * mult) + resolution[1] / 2 - int(280 * mult)) / 2)))
+		
+		if (mouse_pos[0] > resolution[0] / 2 - int(325 * mult) and mouse_pos[0] < resolution[0] / 2 - int(265 * mult) and mouse_pos[1] > resolution[1] / 2 - int(130 * mult) and mouse_pos[1] < resolution[1] / 2 - int(70 * mult)):
+			pygame.draw.polygon(window, param_on_click_color, ((resolution[0] / 2 - int(265 * mult), resolution[1] / 2 - int(130 * mult)), (resolution[0] / 2 - int(265 * mult), resolution[1] / 2 - int(70 * mult)), (resolution[0] / 2 - int(325 * mult), (resolution[1] / 2 - int(70 * mult) + resolution[1] / 2 - int(130 * mult)) / 2)))
+			if (pygame.mouse.get_pressed()[0]):
+				wait_mouse_up()
+				if (int_fps == 0):
+					int_fps = len(fps_tab) - 1
+				else:
+					int_fps = int_fps - 1
+				maxFps = fps_tab[int_fps]
+		else:
+			pygame.draw.polygon(window, param_color, ((resolution[0] / 2 - int(265 * mult), resolution[1] / 2 - int(130 * mult)), (resolution[0] / 2 - int(265 * mult), resolution[1] / 2 - int(70 * mult)), (resolution[0] / 2 - int(325 * mult), (resolution[1] / 2 - int(70 * mult) + resolution[1] / 2 - int(130 * mult)) / 2)))
+
+		if (mouse_pos[0] > resolution[0] / 2 - int(325 * mult) and mouse_pos[0] < resolution[0] / 2 - int(265 * mult) and mouse_pos[1] > resolution[1] / 2 + int(20 * mult) and mouse_pos[1] < resolution[1] / 2 + int(80 * mult)):
+			pygame.draw.polygon(window, param_on_click_color, ((resolution[0] / 2 - int(265 * mult), resolution[1] / 2 + int(20 * mult)), (resolution[0] / 2 - int(265 * mult), resolution[1] / 2 + int(80 * mult)), (resolution[0] / 2 - int(325 * mult), (resolution[1] / 2 + int(80 * mult) + resolution[1] / 2 + int(20 * mult)) / 2)))
+			if (pygame.mouse.get_pressed()[0]):
+				wait_mouse_up()
+				if (int_lang == 0):
+					int_lang = len(lang_tab) - 1
+				else:
+					int_lang = int_lang - 1
+				LANG = lang_tab[int_lang]
+		else:
+			pygame.draw.polygon(window, param_color, ((resolution[0] / 2 - int(265 * mult), resolution[1] / 2 + int(20 * mult)), (resolution[0] / 2 - int(265 * mult), resolution[1] / 2 + int(80 * mult)), (resolution[0] / 2 - int(325 * mult), (resolution[1] / 2 + int(80 * mult) + resolution[1] / 2 + int(20 * mult)) / 2)))
+		
+		if (mouse_pos[0] < resolution[0] / 2 + int(325 * mult) and mouse_pos[0] > resolution[0] / 2 + int(265 * mult) and mouse_pos[1] > resolution[1] / 2 - int(280 * mult) and mouse_pos[1] < resolution[1] / 2 - int(220 * mult)):
+			pygame.draw.polygon(window, param_on_click_color, ((resolution[0] / 2 + int(265 * mult), resolution[1] / 2 - int(280 * mult)), (resolution[0] / 2 + int(265 * mult), resolution[1] / 2 - int(220 * mult)), (resolution[0] / 2 + int(325 * mult), (resolution[1] / 2 - int(220 * mult) + resolution[1] / 2 - int(280 * mult)) / 2)))
+			if (pygame.mouse.get_pressed()[0]):
+				wait_mouse_up()
+				if (int_res == len(res_tab) - 1):
+					int_res = 0
+				else:
+					int_res = int_res + 1
+				if (int_res == 0):
+					resolution = (infoObject.current_w, infoObject.current_h)
+					window = pygame.display.set_mode(resolution)
+					pygame.display.toggle_fullscreen()
+				else:
+					resolution = res_tab[int_res]
+					window = pygame.display.set_mode(resolution)
+				if (int_res <= 1):
+					mult = 1.0
+				elif (int_res == 2):
+					mult = float(5/6)
+				elif (int_res == 3):
+					mult = float(2/3)
+				elif (int_res == 4):
+					mult = float(1/2)
+
+		else:
+			pygame.draw.polygon(window, param_color, ((resolution[0] / 2 + int(265 * mult), resolution[1] / 2 - int(280 * mult)), (resolution[0] / 2 + int(265 * mult), resolution[1] / 2 - int(220 * mult)), (resolution[0] / 2 + int(325 * mult), (resolution[1] / 2 - int(220 * mult) + resolution[1] / 2 - int(280 * mult)) / 2)))
+
+		if (mouse_pos[0] < resolution[0] / 2 + int(325 * mult) and mouse_pos[0] > resolution[0] / 2 + int(265 * mult) and mouse_pos[1] > resolution[1] / 2 - int(130 * mult) and mouse_pos[1] < resolution[1] / 2 - int(70 * mult)):
+			pygame.draw.polygon(window, param_on_click_color, ((resolution[0] / 2 + int(265 * mult), resolution[1] / 2 - int(130 * mult)), (resolution[0] / 2 + int(265 * mult), resolution[1] / 2 - int(70 * mult)), (resolution[0] / 2 + int(325 * mult), (resolution[1] / 2 - int(70 * mult) + resolution[1] / 2 - int(130 * mult)) / 2)))
+			if (pygame.mouse.get_pressed()[0]):
+				wait_mouse_up()
+				if (int_fps == len(fps_tab) - 1):
+					int_fps = 0
+				else:
+					int_fps = int_fps + 1
+				maxFps = fps_tab[int_fps]
+		else:
+			pygame.draw.polygon(window, param_color, ((resolution[0] / 2 + int(265 * mult), resolution[1] / 2 - int(130 * mult)), (resolution[0] / 2 + int(265 * mult), resolution[1] / 2 - int(70 * mult)), (resolution[0] / 2 + int(325 * mult), (resolution[1] / 2 - int(70 * mult) + resolution[1] / 2 - int(130 * mult)) / 2)))
+		
+		if (mouse_pos[0] < resolution[0] / 2 + int(325 * mult) and mouse_pos[0] > resolution[0] / 2 + int(265 * mult) and mouse_pos[1] > resolution[1] / 2 + int(20 * mult) and mouse_pos[1] < resolution[1] / 2 + int(80 * mult)):
+			pygame.draw.polygon(window, param_on_click_color, ((resolution[0] / 2 + int(265 * mult), resolution[1] / 2 + int(20 * mult)), (resolution[0] / 2 + int(265 * mult), resolution[1] / 2 + int(80 * mult)), (resolution[0] / 2 + int(325 * mult), (resolution[1] / 2 + int(80 * mult) + resolution[1] / 2 + int(20 * mult)) / 2)))
+			if (pygame.mouse.get_pressed()[0]):
+				wait_mouse_up()
+				if (int_lang == len(lang_tab) - 1):
+					int_lang = 0
+				else:
+					int_lang = int_lang + 1
+				LANG = lang_tab[int_lang]
+		else:
+			pygame.draw.polygon(window, param_color, ((resolution[0] / 2 + int(265 * mult), resolution[1] / 2 + int(20 * mult)), (resolution[0] / 2 + int(265 * mult), resolution[1] / 2 + int(80 * mult)), (resolution[0] / 2 + int(325 * mult), (resolution[1] / 2 + int(80 * mult) + resolution[1] / 2 + int(20 * mult)) / 2)))
+
+		if (mouse_pos[0] > resolution[0] / 2 - int(250 * mult) and mouse_pos[1] < resolution[0] / 2 + int(250 * mult) and mouse_pos[1] > resolution[1] / 2 + int(150 * mult) and mouse_pos[1] < resolution[1] / 2 + int(250 * mult)):
+			displayRect(window, (resolution[0] / 2 - int(250 * mult), resolution[1] / 2 + int(150 * mult), int(500 * mult), int(100 * mult)), (80, 80, 80), int(49 * mult))
+			if (pygame.mouse.get_pressed()[0]):
+				wait_mouse_up()
+				buff = choice_color(window, (30, 30, 30), 0)
+				if (buff == False):
+					return (False)
+				if (buff != True):
+					background = buff
+		else:
+			displayRect(window, (resolution[0] / 2 - int(250 * mult), resolution[1] / 2 + int(150 * mult), int(500 * mult), int(100 * mult)), param_color, int(49 * mult))
+		displayText(window, LANG["background"], (resolution[0] / 2, resolution[1] / 2 + int(200 * mult)), write_color, int(70 * mult))
+
+		if (mouse_pos[0] > resolution[0] / 2 - int(250 * mult) and mouse_pos[1] < resolution[0] / 2 + int(250 * mult) and mouse_pos[1] > resolution[1] / 2 + int(300 * mult) and mouse_pos[1] < resolution[1] / 2 + int(400 * mult)):
+			displayRect(window, (resolution[0] / 2 - int(250 * mult), resolution[1] / 2 + int(300 * mult), int(500 * mult), int(100 * mult)), (80, 80, 80), int(49 * mult))
+			if (pygame.mouse.get_pressed()[0]):
+				wait_mouse_up()
+				buff = choice_color(window, (255, 255, 255), 1)
+				if (buff == False):
+					return (False)
+				if (buff != True):
+					write_color = buff
+		else:
+			displayRect(window, (resolution[0] / 2 - int(250 * mult), resolution[1] / 2 + int(300 * mult), int(500 * mult), int(100 * mult)), param_color, int(49 * mult))
+		displayText(window, LANG["writing_color"], (resolution[0] / 2, resolution[1] / 2 + int(350 * mult)), write_color, int(70 * mult))
+
+		pygame.display.update()
+
+		for event in pygame.event.get():
+			if (event.type == QUIT):
+				return (False)
+			if (event.type == KEYDOWN):
+				if (event.key == K_ESCAPE):
+					running = False
+		clockFps.tick(maxFps)
+	return (True)
+
+def Profile(window):
+	running = True
+	while (running == True):
+
+		window.fill(background)
+		pygame.display.update()
+
+		for event in pygame.event.get():
+			if (event.type == QUIT):
+				return (False)
+			if (event.type == KEYDOWN):
+				if (event.key == K_ESCAPE):
+					running = False
+		clockFps.tick(maxFps)
+	return (True)
+
+def Menu(window):
+	global alpha_load
+	global aa_load
+
+	mouse_pos = pygame.mouse.get_pos()
+	value = True;
+
+	if (alpha_load >= 255):
+		aa_load = True
+
+	window.fill(background)
+	displayText(window, "Minigames", (resolution[0] / 2, resolution[1] / 2 - int(300 * mult)), write_color, int(250 * mult), aa_load, alpha_load)
+	
+	if (mouse_pos[0] > resolution[0] / 2 - int(250 * mult) and mouse_pos[0] < resolution[0] / 2 + int(250 * mult) and mouse_pos[1] > resolution[1] / 2 - int(100 * mult) and mouse_pos[1] < resolution[1] / 2):
+		displayRect(window, (resolution[0] / 2 - int(250 * mult), resolution[1] / 2 - int(100 * mult), int(500 * mult), int(100 * mult)), (button_on_click_color[0], button_on_click_color[1], button_on_click_color[2], alpha_load), int(49 * mult), aa_load)
+		if (pygame.mouse.get_pressed()[0]):
+			wait_mouse_up()
+			value = Play(window)
+			alpha_load = 255
+			aa_load = True
+			if (value == False):
+				return (False)
+	else:
+		displayRect(window, (resolution[0] / 2 - int(250 * mult), resolution[1] / 2 - int(100 * mult), int(500 * mult), int(100 * mult)), (button_color[0], button_color[1], button_color[2], alpha_load), int(49 * mult), aa_load)
+	displayText(window, LANG["play"], (resolution[0] / 2, resolution[1] / 2 - int(50 * mult)), write_color, int(70 * mult), aa_load, alpha_load)
+
+	if (mouse_pos[0] > resolution[0] / 2 - int(250 * mult) and mouse_pos[0] < resolution[0] / 2 + int(250 * mult) and mouse_pos[1] > resolution[1] / 2 + int(50 * mult) and mouse_pos[1] < resolution[1] / 2 + int(150 * mult)):
+		displayRect(window, (resolution[0] / 2 - int(250 * mult), resolution[1] / 2 + int(50 * mult), int(500 * mult), int(100 * mult)), (button_on_click_color[0], button_on_click_color[1], button_on_click_color[2], alpha_load), int(49 * mult), aa_load)
+		if (pygame.mouse.get_pressed()[0]):
+			wait_mouse_up()
+			value = Profile(window)
+			alpha_load = 255
+			aa_load = True
+			if (value == False):
+				return (False)
+	else:
+		displayRect(window, (resolution[0] / 2 - int(250 * mult), resolution[1] / 2 + int(50 * mult), int(500 * mult), int(100 * mult)), (button_color[0], button_color[1], button_color[2], alpha_load), int(49 * mult), aa_load)
+	displayText(window, LANG["profile"], (resolution[0] / 2, resolution[1] / 2 + int(100 * mult)), write_color, int(70 * mult), aa_load, alpha_load)
+
+	if (mouse_pos[0] > resolution[0] / 2 - int(250 * mult) and mouse_pos[0] < resolution[0] / 2 + int(250 * mult) and mouse_pos[1] > resolution[1] / 2 + int(200 * mult) and mouse_pos[1] < resolution[1] / 2 + int(300 * mult)):
+		displayRect(window, (resolution[0] / 2 - int(250 * mult), resolution[1] / 2 + int(200 * mult), int(500 * mult), int(100 * mult)), (button_on_click_color[0], button_on_click_color[1], button_on_click_color[2], alpha_load), int(49 * mult), aa_load)
+		if (pygame.mouse.get_pressed()[0]):
+			wait_mouse_up()
+			value = Param(window)
+			alpha_load = 255
+			aa_load = True
+			if (value == False):
+				return (False)
+	else:
+		displayRect(window, (resolution[0] / 2 - int(250 * mult), resolution[1] / 2 + int(200 * mult), int(500 * mult), int(100 * mult)), (button_color[0], button_color[1], button_color[2], alpha_load), int(49 * mult), aa_load)
+	displayText(window, LANG["param"], (resolution[0] / 2, resolution[1] / 2 + int(250 * mult)), write_color, int(70 * mult), aa_load, alpha_load)
+
+	pygame.display.update()
+	return (value)
+
+def save_param():
+	file = open(".settings", "w")
+	file.write(str(resolution[0]) + ";" + str(resolution[1]) + "\n")
+	file.write(str(int_res) + "\n")
+	file.write(str(mult) + "\n")
+	file.write(str(maxFps) + "\n")
+	file.write(str(int_fps) + "\n")
+	file.write(str(int_lang) + "\n")
+	file.write(str(background[0]) + ";" + str(background[1]) + ";" + str(background[2]) + "\n")
+	file.write(str(write_color[0]) + ";" + str(write_color[1]) + ";" + str(write_color[2]) + "\n")
+	file.write(str(button_color[0]) + ";" + str(button_color[1]) + ";" + str(button_color[2]) + "\n")
+	file.write(str(button_on_click_color[0]) + ";" + str(button_on_click_color[1]) + ";" + str(button_on_click_color[2]) + "\n")
+	file.write(str(param_color[0]) + ";" + str(param_color[1]) + ";" + str(param_color[2]) + "\n")
+	file.write(str(param_on_click_color[0]) + ";" + str(param_on_click_color[1]) + ";" + str(param_on_click_color[2]) + "\n")
+	file.write(str(rainbow_b) + "\n")
+	file.write(str(rainbow_w) + "\n")
+	file.close()
+
+def animation(window):
+	running = True
+	alpha = 0
+	check = 0
+	r = 0
+	g = 0
+	b = 0
+
+	time.sleep(1)
+	while (running == True and alpha >= 0):
+		window.fill((r, g, b))
+		displayText(window, "Minigames", (resolution[0] / 2, resolution[1] / 2 - int(100 * mult)), write_color, int(300 * mult), False, alpha)
+		displayText(window, LANG["by"] + " Thibaut GUERIN", (resolution[0] / 2, resolution[1] / 2 + int(60 * mult)), write_color, int(50 * mult), False, alpha)
+		if (alpha == 255):
+			check = 1
+		if (check == 0):
+			alpha = alpha + 1
+		else:
+			alpha = alpha - 1
+		pygame.display.update()
+		for event in pygame.event.get():
+			if (event.type == QUIT):
+				return (False)
+			if (event.type == KEYDOWN):
+				if (event.key == K_ESCAPE):
+					running = False
+				if (event.key == K_RETURN):
+					running = False
+		clockFps.tick(80)
+	pygame.mouse.set_visible(True)
+	if (running == True):
+		cut_load = time.time() + 8
+		while ((r != background[0] or g != background[1] or b != background[2]) and running == True):
+			window.fill((r, g, b))
+			if (r < background[0]):
+				r = r + 1
+			elif (r > background[0]):
+				r = r - 1
+			if (g < background[1]):
+				g = g + 1
+			elif (g > background[1]):
+				g = g - 1
+			if (b < background[2]):
+				b = b + 1
+			elif (b > background[2]):
+				b = b - 1
+			pygame.display.update()
+			clockFps.tick(80)
+			if (cut_load < time.time()):
+				break
+			for event in pygame.event.get():
+				if (event.type == QUIT):
+					return (False)
+				if (event.type == KEYDOWN):
+					if (event.key == K_ESCAPE):
+						running = False
+					if (event.key == K_RETURN):
+						running = False
+	return (True)
+
+def get_data(req):
+	reqq = cursor.execute(req)
+	return (reqq.fetchall())
+
+def new_user(user):
+	cursor.execute("INSERT INTO users(pseudo, password) VALUES(?, ?)", user)
+	connection.commit()
+
+# def string_encrypt(string):
+# 	str_encrypt = KEY.encrypt(string)
+# 	return (str_encrypt)
+
+# def string_decrypt(string):
+# 	str_decrypt = KEY.decrypt(string)
+# 	return (str_decrypt)
+
+def write_pass(window, password, bad):
+	pswd = str("")
+	writing = True
+
+	if (bad == True):
+		displayText(window, LANG["bad_pswd"], (resolution[0] / 2, resolution[1] / 2 + int(220 * mult)), (255, 0, 0), int(50 * mult))
+	else:
+		displayRect(window, (0, 0, resolution[0], resolution[1]), (30, 30, 30, 200), 0, False)
+	while (writing == True):
+		for event in pygame.event.get():
+			if (event.type == QUIT):
+				return (3)
+			if (event.type == KEYDOWN):
+				if (event.key == K_RETURN):
+					writing = False
+				if (event.key == K_ESCAPE):
+					return (0)
+				if (event.key == K_a):
+					if (len(pswd) < 20):
+						pswd = pswd + "a"
+				if (event.key == K_b):
+					if (len(pswd) < 20):
+						pswd = pswd + "b"
+				if (event.key == K_c):
+					if (len(pswd) < 20):
+						pswd = pswd + "c"
+				if (event.key == K_d):
+					if (len(pswd) < 20):
+						pswd = pswd + "d"
+				if (event.key == K_e):
+					if (len(pswd) < 20):
+						pswd = pswd + "e"
+				if (event.key == K_f):
+					if (len(pswd) < 20):
+						pswd = pswd + "f"
+				if (event.key == K_g):
+					if (len(pswd) < 20):
+						pswd = pswd + "g"
+				if (event.key == K_h):
+					if (len(pswd) < 20):
+						pswd = pswd + "h"
+				if (event.key == K_i):
+					if (len(pswd) < 20):
+						pswd = pswd + "i"
+				if (event.key == K_j):
+					if (len(pswd) < 20):
+						pswd = pswd + "j"
+				if (event.key == K_k):
+					if (len(pswd) < 20):
+						pswd = pswd + "k"
+				if (event.key == K_l):
+					if (len(pswd) < 20):
+						pswd = pswd + "l"
+				if (event.key == K_m):
+					if (len(pswd) < 20):
+						pswd = pswd + "m"
+				if (event.key == K_n):
+					if (len(pswd) < 20):
+						pswd = pswd + "n"
+				if (event.key == K_o):
+					if (len(pswd) < 20):
+						pswd = pswd + "o"
+				if (event.key == K_p):
+					if (len(pswd) < 20):
+						pswd = pswd + "p"
+				if (event.key == K_q):
+					if (len(pswd) < 20):
+						pswd = pswd + "q"
+				if (event.key == K_r):
+					if (len(pswd) < 20):
+						pswd = pswd + "r"
+				if (event.key == K_s):
+					if (len(pswd) < 20):
+						pswd = pswd + "s"
+				if (event.key == K_t):
+					if (len(pswd) < 20):
+						pswd = pswd + "t"
+				if (event.key == K_u):
+					if (len(pswd) < 20):
+						pswd = pswd + "u"
+				if (event.key == K_v):
+					if (len(pswd) < 20):
+						pswd = pswd + "v"
+				if (event.key == K_w):
+					if (len(pswd) < 20):
+						pswd = pswd + "w"
+				if (event.key == K_x):
+					if (len(pswd) < 20):
+						pswd = pswd + "x"
+				if (event.key == K_y):
+					if (len(pswd) < 20):
+						pswd = pswd + "y"
+				if (event.key == K_z):
+					if (len(pswd) < 20):
+						pswd = pswd + "z"
+				if (event.key == K_UNDERSCORE):
+					if (len(pswd) < 20):
+						pswd = pswd + "_"
+				if (event.key == K_MINUS):
+					if (len(pswd) < 20):
+						pswd = pswd + "-"
+				if (event.key == K_DELETE or event.key == K_BACKSPACE):
+					pswd = pswd[:-1]
+		displayRect(window, (resolution[0] / 2 - int(250 * mult), resolution[1] / 2 - int(50 * mult), int(500 * mult), int(100 * mult)), (25, 25, 25), int(49 * mult))
+		if (len(pswd) != 0):
+			displayText(window, ((len(pswd) * "*") + "|"), (resolution[0] / 2, resolution[1] / 2), write_color, int(70 * mult))
+		else:
+			displayText(window, LANG["password"], (resolution[0] / 2, resolution[1] / 2), (60, 60, 60), int(70 * mult))
+		pygame.display.update()
+		clockFps.tick(maxFps)
+	if (pswd == password):
+		return (1)
+	else:
+		return (write_pass(window, password, True))
+
+def input_text(window, pos, text, secu, itype):
+	mouse_pos = pygame.mouse.get_pos()
+	writing = False
+	if (mouse_pos[0] > pos[0] and mouse_pos[0] < pos[0] + pos[2] and mouse_pos[1] > pos[1] and mouse_pos[1] < pos[1] + pos[3]):
+		displayRect(window, pos, (80, 80, 80), int(49 * mult))
+		if (pygame.mouse.get_pressed()[0]):
+			wait_mouse_up()
+			writing = True
+			while (writing == True):
+				mouse_pos = pygame.mouse.get_pos()
+				for event in pygame.event.get():
+					if (event.type == QUIT):
+						return (False)
+					if (event.type == KEYDOWN):
+						if (event.key == K_RETURN):
+							writing = False
+						if (event.key == K_ESCAPE):
+							writing = False
+						if (event.key == K_a):
+							if (len(text) < 20):
+								text = text + "a"
+						if (event.key == K_b):
+							if (len(text) < 20):
+								text = text + "b"
+						if (event.key == K_c):
+							if (len(text) < 20):
+								text = text + "c"
+						if (event.key == K_d):
+							if (len(text) < 20):
+								text = text + "d"
+						if (event.key == K_e):
+							if (len(text) < 20):
+								text = text + "e"
+						if (event.key == K_f):
+							if (len(text) < 20):
+								text = text + "f"
+						if (event.key == K_g):
+							if (len(text) < 20):
+								text = text + "g"
+						if (event.key == K_h):
+							if (len(text) < 20):
+								text = text + "h"
+						if (event.key == K_i):
+							if (len(text) < 20):
+								text = text + "i"
+						if (event.key == K_j):
+							if (len(text) < 20):
+								text = text + "j"
+						if (event.key == K_k):
+							if (len(text) < 20):
+								text = text + "k"
+						if (event.key == K_l):
+							if (len(text) < 20):
+								text = text + "l"
+						if (event.key == K_m):
+							if (len(text) < 20):
+								text = text + "m"
+						if (event.key == K_n):
+							if (len(text) < 20):
+								text = text + "n"
+						if (event.key == K_o):
+							if (len(text) < 20):
+								text = text + "o"
+						if (event.key == K_p):
+							if (len(text) < 20):
+								text = text + "p"
+						if (event.key == K_q):
+							if (len(text) < 20):
+								text = text + "q"
+						if (event.key == K_r):
+							if (len(text) < 20):
+								text = text + "r"
+						if (event.key == K_s):
+							if (len(text) < 20):
+								text = text + "s"
+						if (event.key == K_t):
+							if (len(text) < 20):
+								text = text + "t"
+						if (event.key == K_u):
+							if (len(text) < 20):
+								text = text + "u"
+						if (event.key == K_v):
+							if (len(text) < 20):
+								text = text + "v"
+						if (event.key == K_w):
+							if (len(text) < 20):
+								text = text + "w"
+						if (event.key == K_x):
+							if (len(text) < 20):
+								text = text + "x"
+						if (event.key == K_y):
+							if (len(text) < 20):
+								text = text + "y"
+						if (event.key == K_z):
+							if (len(text) < 20):
+								text = text + "z"
+						if (event.key == K_UNDERSCORE):
+							if (len(text) < 20):
+								text = text + "_"
+						if (event.key == K_MINUS):
+							if (len(text) < 20):
+								text = text + "-"
+						if (event.key == K_DELETE or event.key == K_BACKSPACE):
+							text = text[:-1]
+		
+				displayRect(window, pos, (80, 80, 80), int(49 * mult))
+				if (secu == True):
+					displayText(window, ((len(text) * "*") + "|"), (pos[0] + pos[2] / 2, pos[1] + pos[3] / 2), write_color, int(50 * mult))
+				else:
+					displayText(window, (text + "|"), (pos[0] + pos[2] / 2, pos[1] + pos[3] / 2), write_color, int(50 * mult))
+				if (mouse_pos[0] < pos[0] or mouse_pos[0] > pos[0] + pos[2] or mouse_pos[1] < pos[1] or mouse_pos[1] > pos[1] + pos[3]):
+					if (pygame.mouse.get_pressed()[0]):
+						displayRect(window, pos, param_color, int(49 * mult))
+						writing = False
+				pygame.display.update()
+				clockFps.tick(maxFps)
+	else:
+		displayRect(window, pos, param_color, int(49 * mult))
+	if (text != ""):
+		if (secu == True):
+			displayText(window, (len(text) * "*"), (pos[0] + pos[2] / 2, pos[1] + pos[3] / 2), write_color, int(50 * mult))
+		else:
+			displayText(window, text, (pos[0] + pos[2] / 2, pos[1] + pos[3] / 2), write_color, int(50 * mult))
+	else:
+		displayText(window, LANG[itype], (pos[0] + pos[2] / 2, pos[1] + pos[3] / 2), (70, 70, 70), int(50 * mult))
+	return (text)
+
+def newUser(window):
+	running = True
+
+	pseudo = ""
+	password = ""
+	verif_password = ""
+
+	bad_form = False
+	bad_verif_password = False
+
+	while (running == True):
+
+		mouse_pos = pygame.mouse.get_pos()
+		window.fill(background)
+		displayText(window, LANG["create_usr"], (resolution[0] / 2, resolution[1] / 2 - int(330 * mult)), write_color, int(70 * mult))
+		
+		if (mouse_pos[0] > resolution[0] / 2 - int(150 * mult) and mouse_pos[0] < resolution[0] / 2 + int(150 * mult) and mouse_pos[1] > resolution[1] / 2 + int(280 * mult) and mouse_pos[1] < resolution[1] / 2 + int(380 * mult)):
+			displayRect(window, (resolution[0] / 2 - int(150 * mult), resolution[1] / 2 + int(280 * mult), int(300 * mult), int(100 * mult)), (80, 80, 80), int(49 * mult))
+			if (pygame.mouse.get_pressed()[0]):
+				wait_mouse_up()
+				if (pseudo == "" or password == "" or verif_password == ""):
+					bad_form = True
+				else:
+					bad_form = False
+				if (password != verif_password):
+					bad_verif_password = True
+				else:
+					bad_verif_password = False
+				if (pseudo != "" and password != "" and verif_password != "" and password == verif_password):
+					cursor.execute("INSERT INTO users(pseudo, password) VALUES(?, ?)", (pseudo, password))
+					connection.commit()
+					return (True)
+		else:
+			displayRect(window, (resolution[0] / 2 - int(150 * mult), resolution[1] / 2 + int(280 * mult), int(300 * mult), int(100 * mult)), param_color, int(49 * mult))
+		displayText(window, LANG["create"], (resolution[0] / 2, resolution[1] / 2 + int(330 * mult)), write_color, int(50 * mult))
+		
+		displayRect(window, (resolution[0] / 2 - int(300 * mult), resolution[1] / 2 - int(200 * mult), int(600 * mult), int(100 * mult)), param_color, int(49 * mult))
+		displayRect(window, (resolution[0] / 2 - int(300 * mult), resolution[1] / 2 - int(50 * mult), int(600 * mult), int(100 * mult)), param_color, int(49 * mult))
+		displayRect(window, (resolution[0] / 2 - int(300 * mult), resolution[1] / 2 + int(100 * mult), int(600 * mult), int(100 * mult)), param_color, int(49 * mult))
+		if (pseudo != ""):
+			displayText(window, pseudo, (resolution[0] / 2, resolution[1] / 2 - int(150 * mult)), write_color, int(50 * mult))
+		else:
+			displayText(window, LANG["pseudo"], (resolution[0] / 2, resolution[1] / 2 - int(150 * mult)), (70, 70, 70), int(50 * mult))
+		if (password != ""):
+			displayText(window, (len(password) * "*"), (resolution[0] / 2, resolution[1] / 2), write_color, int(50 * mult))
+		else:
+			displayText(window, LANG["password"], (resolution[0] / 2, resolution[1] / 2), (70, 70, 70), int(50 * mult))	
+		if (verif_password != ""):
+			displayText(window, (len(verif_password) * "*"), (resolution[0] / 2, resolution[1] / 2 + int(150 * mult)), write_color, int(50 * mult))
+		else:
+			displayText(window, LANG["verif_password"], (resolution[0] / 2, resolution[1] / 2 + int(150 * mult)), (70, 70, 70), int(50 * mult))
+		
+		if (bad_form == True):
+			displayText(window, LANG["bad_form"], (resolution[0] / 2, resolution[1] / 2 + int(240 * mult)), (255, 0, 0), int(50 * mult))
+		elif (bad_verif_password == True):
+			displayText(window, LANG["bad_verif_password"], (resolution[0] / 2, resolution[1] / 2 + int(240 * mult)), (255, 0, 0), int(50 * mult))
+
+
+		pseudo = input_text(window, (resolution[0] / 2 - int(300 * mult), resolution[1] / 2 - int(200 * mult), int(600 * mult), int(100 * mult)), pseudo, False, "pseudo")
+		password = input_text(window, (resolution[0] / 2 - int(300 * mult), resolution[1] / 2 - int(50 * mult), int(600 * mult), int(100 * mult)), password, True, "password")
+		verif_password = input_text(window, (resolution[0] / 2 - int(300 * mult), resolution[1] / 2 + int(100 * mult), int(600 * mult), int(100 * mult)), verif_password, True, "verif_password")
+
+
+		pygame.display.update()
+
+		for event in pygame.event.get():
+			if (event.type == QUIT):
+				return (False)
+			if (event.type == KEYDOWN):
+				if (event.key == K_ESCAPE):
+					running = False
+		clockFps.tick(maxFps)
+	return (True)
+
+def deleteUser(window, user, users_data):
+	global global_profile
+	running = True
+	while (running == True):
+
+		window.fill(background)
+
+		displayText(window, LANG["delete_usr?"] + " (" + user + ")", (resolution[0] / 2, resolution[1] / 2 - int(200 * mult)), write_color, int(70 * mult))
+
+		mouse_pos = pygame.mouse.get_pos()
+
+		if (mouse_pos[0] < resolution[0] / 2 + int(350 * mult) and mouse_pos[0] > resolution[0] / 2 + int(50 * mult) and mouse_pos[1] > resolution[1] / 2 - int(50 * mult) and mouse_pos[1] < resolution[1] / 2 + int(50 * mult)):
+			displayRect(window, (resolution[0] / 2 + int(50 * mult), resolution[1] / 2 - int(50 * mult), int(300 * mult), int(100 * mult)), (80, 80, 80), int(49 * mult))
+			if (pygame.mouse.get_pressed()[0]):
+				wait_mouse_up()
+				return (True)
+		else:
+			displayRect(window, (resolution[0] / 2 + int(50 * mult), resolution[1] / 2 - int(50 * mult), int(300 * mult), int(100 * mult)), param_color, int(49 * mult))
+		displayText(window, LANG["no"], (resolution[0] / 2 + int(200 * mult), resolution[1] / 2), write_color, int(50 * mult))
+		
+		if (mouse_pos[0] > resolution[0] / 2 - int(350 * mult) and mouse_pos[0] < resolution[0] / 2 - int(50 * mult) and mouse_pos[1] > resolution[1] / 2 - int(50 * mult) and mouse_pos[1] < resolution[1] / 2 + int(50 * mult)):
+			displayRect(window, (resolution[0] / 2 - int(350 * mult), resolution[1] / 2 - int(50 * mult), int(300 * mult), int(100 * mult)), (80, 80, 80), int(49 * mult))
+			if (pygame.mouse.get_pressed()[0]):	
+				wait_mouse_up()
+				cursor.execute("DELETE FROM users WHERE id = ?", (str(users_data[abs(global_profile)][0]),))
+				connection.commit()
+				if (abs(global_profile) == len(users_data) - 1):
+					global_profile = global_profile + 1
+				if (len(users_data) - 1 == 0):
+					global_profile = 0
+				return (True)
+		else:
+			displayRect(window, (resolution[0] / 2 - int(350 * mult), resolution[1] / 2 - int(50 * mult), int(300 * mult), int(100 * mult)), param_color, int(49 * mult))
+		displayText(window, LANG["yes"], (resolution[0] / 2 - int(200 * mult), resolution[1] / 2), write_color, int(50 * mult))
+
+
+		pygame.display.update()
+
+		for event in pygame.event.get():
+			if (event.type == QUIT):
+				return (False)
+			if (event.type == KEYDOWN):
+				if (event.key == K_ESCAPE):
+					running = False
+		clockFps.tick(maxFps)
+	return (True)
+
+def want_quit(window):
+	running = True
+	while (running == True):
+
+		window.fill(background)
+		
+		displayText(window, LANG["quit_prog"], (resolution[0] / 2, resolution[1] / 2 - int(200 * mult)), write_color, int(70 * mult))
+
+		mouse_pos = pygame.mouse.get_pos()
+
+		if (mouse_pos[0] < resolution[0] / 2 + int(350 * mult) and mouse_pos[0] > resolution[0] / 2 + int(50 * mult) and mouse_pos[1] > resolution[1] / 2 - int(50 * mult) and mouse_pos[1] < resolution[1] / 2 + int(50 * mult)):
+			displayRect(window, (resolution[0] / 2 + int(50 * mult), resolution[1] / 2 - int(50 * mult), int(300 * mult), int(100 * mult)), (80, 80, 80), int(49 * mult))
+			if (pygame.mouse.get_pressed()[0]):
+				wait_mouse_up()
+				return (True)
+		else:
+			displayRect(window, (resolution[0] / 2 + int(50 * mult), resolution[1] / 2 - int(50 * mult), int(300 * mult), int(100 * mult)), param_color, int(49 * mult))
+		displayText(window, LANG["no"], (resolution[0] / 2 + int(200 * mult), resolution[1] / 2), write_color, int(50 * mult))
+		
+		if (mouse_pos[0] > resolution[0] / 2 - int(350 * mult) and mouse_pos[0] < resolution[0] / 2 - int(50 * mult) and mouse_pos[1] > resolution[1] / 2 - int(50 * mult) and mouse_pos[1] < resolution[1] / 2 + int(50 * mult)):
+			displayRect(window, (resolution[0] / 2 - int(350 * mult), resolution[1] / 2 - int(50 * mult), int(300 * mult), int(100 * mult)), (80, 80, 80), int(49 * mult))
+			if (pygame.mouse.get_pressed()[0]):	
+				wait_mouse_up()
+				return (False)
+		else:
+			displayRect(window, (resolution[0] / 2 - int(350 * mult), resolution[1] / 2 - int(50 * mult), int(300 * mult), int(100 * mult)), param_color, int(49 * mult))
+		displayText(window, LANG["yes"], (resolution[0] / 2 - int(200 * mult), resolution[1] / 2), write_color, int(50 * mult))
+
+		pygame.display.update()
+
+		for event in pygame.event.get():
+			if (event.type == QUIT):
+				return (False)
+			if (event.type == KEYDOWN):
+				if (event.key == K_ESCAPE):
+					running = False
+		clockFps.tick(maxFps)
+	return (True)
+
+def profiles(window):
+	global global_profile
+	global PLAYER
+	global alpha_profile
+	running = True
+	PLAYER = 0
+	while (running == True):
+		users_data = get_data("SELECT * FROM users")
+		x = resolution[0] / 2 - int(126 * mult) + global_profile * int(362 * mult)
+		xt = resolution[0] / 2 + global_profile * int(362 * mult)
+		i = 0
+
+		window.fill(background)
+		displayRect(window, (resolution[0] / 2 - int(150 * mult), resolution[1] / 2 - int(150 * mult), int(300 * mult), int(300 * mult)), (20, 255, 20), int(50 * mult))
+		if (len(users_data) == 0):
+			displayText(window, LANG["no_usr"], (resolution[0] / 2, resolution[1] / 2), write_color, int(50 * mult))
+		displayText(window, LANG["profiles"], (resolution[0] / 2, resolution[1] / 2 - int(330 * mult)), write_color, int(100 * mult))
+
+		while (i != len(users_data)):
+			displayRect(window, (x, resolution[1] / 2 - int(126* mult), int(252 * mult), int(252 * mult)), param_color, int(50 * mult))
+			displayText(window, users_data[i][1], (xt, resolution[1] / 2), write_color, int(40 * mult))
+			x = x + int(362 * mult)
+			xt = xt + int(362 * mult)
+			i = i + 1
+
+		mouse_pos = pygame.mouse.get_pos()
+
+		if (mouse_pos[0] > resolution[0] / 2 - int(935 * mult) and mouse_pos[0] < resolution[0] / 2 - int(885 * mult) and mouse_pos[1] > resolution[1] / 2 - int(30 * mult) and mouse_pos[1] < resolution[1] / 2 + int(30 * mult)):
+			pygame.draw.polygon(window, (200, 200, 200), ((resolution[0] / 2 - int(885 * mult), resolution[1] / 2 - int(30 * mult)), (resolution[0] / 2 - int(885 * mult), resolution[1] / 2 + int(30 * mult)), (resolution[0] / 2 - int(935 * mult), (resolution[1] / 2))))
+			if (pygame.mouse.get_pressed()[0]):
+				wait_mouse_up()
+				if (global_profile < 0):
+					global_profile = global_profile + 1
+		else:
+			pygame.draw.polygon(window, (150, 150, 150), ((resolution[0] / 2 - int(885 * mult), resolution[1] / 2 - int(30 * mult)), (resolution[0] / 2 - int(885 * mult), resolution[1] / 2 + int(30 * mult)), (resolution[0] / 2 - int(935 * mult), (resolution[1] / 2))))
+		
+		if (mouse_pos[0] < resolution[0] / 2 + int(935 * mult) and mouse_pos[0] > resolution[0] / 2 + int(885 * mult) and mouse_pos[1] > resolution[1] / 2 - int(30 * mult) and mouse_pos[1] < resolution[1] / 2 + int(30 * mult)):
+			pygame.draw.polygon(window, (200, 200, 200), ((resolution[0] / 2 + int(885 * mult), resolution[1] / 2 - int(30 * mult)), (resolution[0] / 2 + int(885 * mult), resolution[1] / 2 + int(30 * mult)), (resolution[0] / 2 + int(935 * mult), (resolution[1] / 2))))
+			if (pygame.mouse.get_pressed()[0]):
+				wait_mouse_up()
+				if (len(users_data) > 1 + abs(global_profile)):
+					global_profile = global_profile - 1
+		else:
+			pygame.draw.polygon(window, (150, 150, 150), ((resolution[0] / 2 + int(885 * mult), resolution[1] / 2 - int(30 * mult)), (resolution[0] / 2 + int(885 * mult), resolution[1] / 2 + int(30 * mult)), (resolution[0] / 2 + int(935 * mult), (resolution[1] / 2))))
+
+
+
+		if (mouse_pos[0] > resolution[0] / 2 - int(550 * mult) and mouse_pos[0] < resolution[0] / 2 - int(50 * mult) and mouse_pos[1] > resolution[1] / 2 + int(300 * mult) and mouse_pos[1] < resolution[1] / 2 + int(400 * mult)):
+			displayRect(window, (resolution[0] / 2 - int(550 * mult), resolution[1] / 2 + int(300 * mult), int(500 * mult), int(100 * mult)), (80, 80, 80), int(49 * mult))
+			if (pygame.mouse.get_pressed()[0]):
+				wait_mouse_up()
+				alpha_profile = 0
+				if (newUser(window) == False):
+					return (False)
+		else:
+			displayRect(window, (resolution[0] / 2 - int(550 * mult), resolution[1] / 2 + int(300 * mult), int(500 * mult), int(100 * mult)), param_color, int(49 * mult))
+		displayText(window, LANG["new_usr"], (resolution[0] / 2 - int(300 * mult), resolution[1] / 2 + int(350 * mult)), write_color, int(50 * mult))
+
+		if (mouse_pos[0] < resolution[0] / 2 + int(550 * mult) and mouse_pos[0] > resolution[0] / 2 + int(50 * mult) and mouse_pos[1] > resolution[1] / 2 + int(300 * mult) and mouse_pos[1] < resolution[1] / 2 + int(400 * mult)):
+			displayRect(window, (resolution[0] / 2 + int(50 * mult), resolution[1] / 2 + int(300 * mult), int(500 * mult), int(100 * mult)), (80, 80, 80), int(49 * mult))
+			displayText(window, LANG["delete_usr"], (resolution[0] / 2 + int(300 * mult), resolution[1] / 2 + int(350 * mult)), write_color, int(50 * mult))
+			if (len(users_data) != 0 and pygame.mouse.get_pressed()[0]):
+				wait_mouse_up()
+				alpha_profile = 0
+				return_pass = write_pass(window, users_data[abs(global_profile)][2], False)
+		
+				if (return_pass == 0):
+					continue
+				elif (return_pass == 1):
+					if (deleteUser(window, users_data[abs(global_profile)][1], users_data) == False):
+						return (False)
+				else:
+					return (False)
+		else:
+			displayRect(window, (resolution[0] / 2 + int(50 * mult), resolution[1] / 2 + int(300 * mult), int(500 * mult), int(100 * mult)), param_color, int(49 * mult))
+			displayText(window, LANG["delete_usr"], (resolution[0] / 2 + int(300 * mult), resolution[1] / 2 + int(350 * mult)), write_color, int(50 * mult))
+
+
+
+		alpha_profile = alpha_profile - 3
+
+		for event in pygame.event.get():
+			if (event.type == QUIT):
+				return (False)
+			if (event.type == KEYDOWN):
+				if (event.key == K_ESCAPE):
+					if (want_quit(window) == True):
+						continue
+					else:
+						return (False)
+				if (len(users_data) != 0 and event.key == K_RETURN):
+					alpha_profile = 0
+					return_pass = write_pass(window, users_data[abs(global_profile)][2], False)
+		
+					if (return_pass == 0):
+						continue
+					elif (return_pass == 1):
+						PLAYER = int(users_data[abs(global_profile)][0])
+						return (True)
+					else:
+						return (False)
+				if (event.key == K_LEFT):
+					if (global_profile < 0):
+						global_profile = global_profile + 1
+				if (event.key == K_RIGHT):
+					if (len(users_data) > 1 + abs(global_profile)):
+						global_profile = global_profile - 1
+
+		if (alpha_profile >= 0):
+			displayRect(window, (0, 0, resolution[0], resolution[1]), (background[0], background[1], background[2], alpha_profile), 0, False)
+		pygame.display.update()
+		clockFps.tick(maxFps)
+	return (True)
+
+def main():
+	global alpha_load
+	global aa_load
+	global rainbow_b
+	global rainbow_w
+
+	pygame.init()
+
+	running = True
+	pygame.mouse.set_visible(False)
+	icon = pygame.image.load("./assets/logo.png")
+	pygame.display.set_icon(icon)
+
+	if (rainbow_b == True):
+		threading.Thread(target=rainbow_background).start()
+	if (rainbow_w == True):
+		threading.Thread(target=rainbow_write).start()
+
+	window = pygame.display.set_mode(resolution)
+	if (int_res == 0):
+		pygame.display.toggle_fullscreen()
+	pygame.display.set_caption("Minigames")
+	
+	if (animation(window) == False):
+		running = False
+
+	if (profiles(window) == False):
+		running = False
+
+	while (running == True):
+		if (alpha_load < 255):
+			alpha_load = alpha_load + 3
+		else:
+			aa = True
+		running = Menu(window)
+		for event in pygame.event.get():
+			if (event.type == QUIT):
+				running = False
+			if (event.type == KEYDOWN):
+				if (event.key == K_ESCAPE):
+					running = profiles(window)
+		clockFps.tick(maxFps)
+	save_param()
+	rainbow_b = False
+	rainbow_w = False
+	pygame.quit()
+	connection.close()
+	exit(0)
+
+main()
